@@ -15,6 +15,12 @@
 *.userosscache
 *.sln.docstates
 
+Include/
+Lib/
+Scripts/
+Share/
+pyvenv.cfg
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

@@ -1,0 +1,3 @@
+numpy==2.2.5
+pygame==2.6.1
+pyopencl==2025.1
