@@ -11,20 +11,25 @@ __kernel void update_positions(
     int i = get_global_id(0);
     double2 pos_i = positions[i];
     double2 vel_i = velocities[i];
-    double2 acc = (double2)(0.0, 0.0);
+
+    double2 total_force = (double2)(0.0, 0.0);
 
     // Compute net acceleration on body i
     for (int j = 0; j < num_bodies; ++j) {
         if (i == j) continue;
+        // Compute the force exerted on body i by body j
         double2 r = positions[j] - pos_i;
-        double dist_sqr = r.x * r.x + r.y * r.y + 1e-10;
-        double inv_dist = native_rsqrt(dist_sqr);
-        double force = G * masses[j] * inv_dist * inv_dist;
-        acc += (force / masses[i]) * (r * inv_dist);
+        double dist_sqr = r.x * r.x + r.y * r.y;
+        double force = G * masses[j] * masses[i] / dist_sqr;
+        double angle = atan2(r.y, r.x);
+        double fx = force * cos(angle);
+        double fy = force * sin(angle);
+        total_force.x += fx;
+        total_force.y += fy;
     }
 
     // Update velocity and position
-    vel_i += acc * timestep;
+    vel_i += total_force / masses[i] * timestep;
     pos_i += vel_i * timestep;
 
     // Write back
